@@ -1,0 +1,217 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 80px;
+  overflow-y: auto;
+}
+
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  width: 90%;
+  max-width: 768px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  margin-bottom: 80px;
+}
+
+.cover {
+  height: 100px;
+  width: 100%;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 24px;
+}
+
+.titleInput {
+  font-size: 1.5rem;
+  font-weight: 700;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--foreground);
+  width: 100%;
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin-left: -8px;
+}
+.titleInput:focus {
+  background: var(--background);
+  border-color: var(--primary);
+  outline: none;
+}
+
+.closeBtn {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.closeBtn:hover {
+  background: var(--surface-hover);
+  color: var(--foreground);
+}
+
+.body {
+  display: flex;
+  padding: 0 24px 24px 24px;
+  gap: 24px;
+}
+
+.main {
+  flex: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.sidebar {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sectionTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.textarea {
+  width: 100%;
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px;
+  color: var(--foreground);
+  font-family: inherit;
+  resize: vertical;
+  min-height: 100px;
+}
+.textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.attachmentList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.attachmentItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--surface-hover);
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+.attLink {
+  color: var(--primary);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+.attLink:hover {
+  text-decoration: underline;
+}
+
+.commentInputBox {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 24px;
+}
+
+.commentsList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.comment {
+  background: var(--background);
+  border: 1px solid var(--border);
+  padding: 12px;
+  border-radius: 8px;
+}
+.commentHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.date {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.commentContent {
+  font-size: 0.9rem;
+  white-space: pre-wrap;
+}
+
+.sidebarSection h4 {
+  font-size: 0.8rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.select {
+  width: 100%;
+  background: var(--background);
+  border: 1px solid var(--border);
+  padding: 8px;
+  border-radius: 6px;
+  color: var(--foreground);
+}
+
+.colorPicker {
+  width: 32px;
+  height: 32px;
+  border: none;
+  padding: 0;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.delBtn {
+  background: transparent;
+  border: none;
+  color: var(--danger);
+  cursor: pointer;
+  padding: 4px;
+  margin-left: auto;
+}
+.delBtn:hover {
+  background: rgba(255, 60, 60, 0.1);
+  border-radius: 4px;
+}
+
+@media (max-width: 768px) {
+  .body {
+    flex-direction: column;
+  }
+}

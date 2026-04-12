@@ -1,0 +1,124 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String            @id @default(cuid())
+  name             String
+  email            String            @unique
+  password         String
+  cards            Card[]
+  comments         Comment[]
+  workspaceMembers WorkspaceMember[]
+  notifications    AppNotification[]
+}
+
+model Workspace {
+  id        String            @id @default(cuid())
+  name      String
+  members   WorkspaceMember[]
+  boards    Board[]
+  createdAt DateTime          @default(now())
+}
+
+model WorkspaceMember {
+  id          String    @id @default(cuid())
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role        String    @default("MEMBER") // ADMIN, MEMBER, GUEST
+  createdAt   DateTime  @default(now())
+
+  @@unique([workspaceId, userId]) // User can only be in a workspace once
+}
+
+model Board {
+  id          String     @id @default(cuid())
+  title       String
+  visibility  String     @default("WORKSPACE") // PRIVATE, WORKSPACE, PUBLIC
+  workspaceId String?
+  workspace   Workspace? @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  lists       List[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  rules       AutomationRule[]
+}
+
+model List {
+  id        String   @id @default(cuid())
+  title     String
+  color     String?  // hex code or specific color string
+
+  order     Int      @default(0)
+  boardId   String
+  board     Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  cards     Card[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Card {
+  id          String       @id @default(cuid())
+  title       String
+  description String?
+  order       Int          @default(0)
+  listId      String
+  list        List         @relation(fields: [listId], references: [id], onDelete: Cascade)
+  assigneeId  String?
+  assignee    User?        @relation(fields: [assigneeId], references: [id], onDelete: SetNull)
+  ownerName   String?
+  dueDate     DateTime?
+  coverColor  String?
+  comments    Comment[]
+  attachments Attachment[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  cardId    String
+  card      Card     @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Attachment {
+  id        String   @id @default(cuid())
+  fileName  String
+  fileUrl   String
+  fileType  String
+  cardId    String
+  card      Card     @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+model AutomationRule {
+  id          String   @id @default(cuid())
+  boardId     String
+  board       Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  triggerType String   // e.g., "CARD_MOVED_TO_LIST"
+  triggerData String   // e.g., "list_id_123"
+  actionType  String   // e.g., "MARK_DUE_DATE_DONE", "ADD_COMMENT", "SET_COLOR"
+  actionData  String   // e.g., "red" or "Great job!"
+  createdAt   DateTime @default(now())
+}
+
+model AppNotification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
