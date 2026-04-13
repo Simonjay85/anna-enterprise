@@ -1,8 +1,15 @@
 # example netlify.toml
 [build]
-  command = "npm run build"
-  functions = "netlify/functions"
+  command = "npx prisma generate && npm run build"
   publish = ".next"
+
+[build.environment]
+  NEXTAUTH_SECRET = "temply-secret-key-for-local-dev-12345"
+  NEXTAUTH_URL = "https://effulgent-unicorn-32cd31.netlify.app"
+  DATABASE_URL = "postgresql://postgres:FV%3FFgA96%247%40eWTf@db.qjiztunfjlcrqcmsnowc.supabase.co:5432/postgres"
+
+[functions]
+  included_files = ["prisma/dev.db"]
 
   ## Uncomment to use this redirect for Single Page Applications like create-react-app.
   ## Not needed for static site generators.
