@@ -34,6 +34,7 @@ export async function POST(req: Request) {
       headers: { "Content-Type": "application/json" }
     });
   } catch (error) {
+    console.error("Register Error:", error);
     return new Response("Internal Server Error", { status: 500 });
   }
 }
