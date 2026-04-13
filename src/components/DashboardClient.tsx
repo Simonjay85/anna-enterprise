@@ -126,7 +126,7 @@ export default function DashboardClient({ initialWorkspaces }: DashboardProps) {
       alert('Excel Imported Successfully! Please refresh the page to see the populated board.');
       window.location.reload();
     } catch (err: any) {
-      alert('Failed to import excel: ' + err.message);
+      alert('Failed to import excel: ' + (err.message || JSON.stringify(err)));
     } finally {
       setIsImporting(false);
       setImportTargetWsId(null);
