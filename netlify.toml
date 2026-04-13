@@ -10,6 +10,7 @@
   DATABASE_URL = "postgresql://postgres.qjiztunfjlcrqcmsnowc:FV%3FFgA96%247%40eWTf@aws-1-ap-northeast-1.pooler.supabase.com:6543/postgres?pgbouncer=true"
 
 [functions]
+  node_bundler = "esbuild"
   included_files = [
     "prisma/dev.db",
     "node_modules/.prisma/client/libquery_engine-rhel*",

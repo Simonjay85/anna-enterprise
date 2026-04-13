@@ -37,117 +37,114 @@ export async function importExcelToWorkspaceAction(workspaceId: string, formData
 
   for (const sheetName of sheetNames) {
     const worksheet = workbook.Sheets[sheetName];
-    // We will parse it as array of rows to bypass merged title rows
     const rawRows = xlsx.utils.sheet_to_json<any[]>(worksheet, { header: 1 });
     if (rawRows.length === 0) continue;
 
+    // Find best header row (most string columns)
     let bestRowIndex = 0;
     let maxCols = 0;
     for (let i = 0; i < Math.min(10, rawRows.length); i++) {
-      const rowProps = rawRows[i]?.filter(c => typeof c === 'string' && c.trim() !== '') || [];
+      const rowProps = rawRows[i]?.filter((c: any) => typeof c === 'string' && c.trim() !== '') || [];
       if (rowProps.length > maxCols) {
         maxCols = rowProps.length;
         bestRowIndex = i;
       }
     }
 
-    const headers = rawRows[bestRowIndex]?.map(h => String(h).trim()) || [];
+    const headers = rawRows[bestRowIndex]?.map((h: any) => String(h).trim()) || [];
     if (headers.length === 0) continue;
 
+    // Parse all data rows
     const jsonRows: Record<string, any>[] = [];
     for (let i = bestRowIndex + 1; i < rawRows.length; i++) {
-        const r = rawRows[i];
-        if (!r || r.length === 0) continue;
-        const mappedRow: Record<string, any> = {};
-        for (let c = 0; c < headers.length; c++) {
-            if (headers[c]) {
-                mappedRow[headers[c]] = r[c];
-            }
-        }
-        jsonRows.push(mappedRow);
+      const r = rawRows[i];
+      if (!r || r.length === 0) continue;
+      const mappedRow: Record<string, any> = {};
+      for (let c = 0; c < headers.length; c++) {
+        if (headers[c]) mappedRow[headers[c]] = r[c];
+      }
+      // Skip completely empty rows
+      const hasData = Object.values(mappedRow).some(v => v !== undefined && v !== null && String(v).trim() !== '');
+      if (hasData) jsonRows.push(mappedRow);
     }
     
     if (jsonRows.length === 0) continue;
 
-    // Create a new board for each sheet
+    // Cap at 500 rows to prevent timeout
+    const limitedRows = jsonRows.slice(0, 500);
+
+    // Create board for this sheet
     const board = await prisma.board.create({
-      data: {
-        title: sheetName,
-        workspaceId,
-      }
+      data: { title: sheetName, workspaceId }
     });
 
-    // Strategy: 
-    // 1. Find all distinct values in the chosen `listColumn` to form the Lists.
-    // Если listColumn is not provided or empty, fallback to "Imported Data".
+    // Collect unique list names
     const listNames = new Set<string>();
-    
     if (listColumn) {
-      jsonRows.forEach(row => {
+      limitedRows.forEach(row => {
         const val = row[listColumn];
         if (val !== undefined && val !== null && String(val).trim() !== '') {
           listNames.add(String(val).trim());
         }
       });
     }
+    if (listNames.size === 0) listNames.add("Imported Data");
 
-    if (listNames.size === 0) {
-      listNames.add("Imported Data");
-    }
+    // Create all lists in one batch
+    const listInputs = Array.from(listNames).map((name, idx) => ({
+      title: name,
+      boardId: board.id,
+      order: idx
+    }));
+    await prisma.list.createMany({ data: listInputs });
 
-    // 2. Create the Lists in the database and keep a map of Name -> ListID
-    const listMap = new Map<string, string>();
-    let listOrder = 0;
-    for (const name of Array.from(listNames)) {
-      const newList = await prisma.list.create({
-        data: { title: name, boardId: board.id, order: listOrder++ }
-      });
-      listMap.set(name, newList.id);
-    }
+    // Fetch back to get IDs
+    const createdLists = await prisma.list.findMany({ where: { boardId: board.id } });
+    const listMap = new Map(createdLists.map(l => [l.title, l.id]));
 
-    // 3. Create Cards
-    for (let r = 0; r < jsonRows.length; r++) {
-      const row = jsonRows[r];
-      // Determine the target list
-      let targetListName = listColumn && row[listColumn] ? String(row[listColumn]).trim() : "Imported Data";
-      if (!listMap.has(targetListName)) {
-        targetListName = "Imported Data";
-      }
-      const listId = listMap.get(targetListName)!;
+    // Build all card inserts
+    const cardInserts: { title: string; description: string; listId: string; order: number; ownerName: string | null }[] = [];
+    const orderCounter = new Map<string, number>();
 
-      // Determine Card Title
-      let cardTitle = cardTitleColumn && row[cardTitleColumn] 
-        ? String(row[cardTitleColumn]).trim() 
-        : `Row ${r + 1}`;
-      
-      if (!cardTitle) cardTitle = "Untitled Card";
+    for (const row of limitedRows) {
+      const targetListName = listColumn && row[listColumn]
+        ? String(row[listColumn]).trim()
+        : "Imported Data";
 
-      // Determine Assignee
+      const listId = listMap.get(targetListName) || listMap.get("Imported Data")!;
+      if (!listId) continue;
+
+      let cardTitle = cardTitleColumn && row[cardTitleColumn]
+        ? String(row[cardTitleColumn]).trim()
+        : "Untitled";
+      if (!cardTitle) cardTitle = "Untitled";
+      if (cardTitle.length > 50) cardTitle = cardTitle.substring(0, 50) + "...";
+
       let ownerName: string | null = null;
       if (assigneeColumn && row[assigneeColumn]) {
         ownerName = String(row[assigneeColumn]).trim();
       }
 
-      // Render extra data into description
-      let description = `**Imported from Excel**\n\n`;
+      // Short description with key data only
+      const descParts: string[] = [];
       for (const [key, value] of Object.entries(row)) {
-        if (value !== undefined && value !== null) {
-          description += `- **${key}:** ${value}\n`;
+        if (value !== undefined && value !== null && String(value).trim() !== '') {
+          descParts.push(`**${key}:** ${value}`);
         }
       }
+      const description = descParts.join('\n');
 
-      const cardCount = await prisma.card.count({ where: { listId } });
-      await prisma.card.create({
-        data: {
-          title: cardTitle.length > 50 ? cardTitle.substring(0, 50) + "..." : cardTitle,
-          description: description,
-          listId: listId,
-          order: cardCount,
-          ownerName: ownerName
-        }
-      });
+      const currentOrder = orderCounter.get(listId) || 0;
+      orderCounter.set(listId, currentOrder + 1);
+
+      cardInserts.push({ title: cardTitle, description, listId, order: currentOrder, ownerName });
+    }
+
+    // Batch insert all cards at once
+    if (cardInserts.length > 0) {
+      await prisma.card.createMany({ data: cardInserts });
     }
   }
 
-  return true;
+  return { success: true };
 }
