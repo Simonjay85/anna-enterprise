@@ -1,0 +1,153 @@
+
+> trello-app@0.1.0 dev
+> next dev --webpack -H 0.0.0.0
+
+▲ Next.js 16.2.3 (webpack)
+- Local:         http://localhost:3000
+- Network:       http://0.0.0.0:3000
+- Environments: .env
+✓ Ready in 261ms
+⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of /Users/aaronnguyen/package-lock.json as the root directory.
+ To silence this warning, set `outputFileTracingRoot` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/output#caveats for more information.
+ Detected additional lockfiles: 
+   * /Users/aaronnguyen/TN/App/Trello/package-lock.json
+
+
+ GET / 200 in 1648ms (next.js: 1494ms, application-code: 154ms)
+ GET /login 200 in 382ms (next.js: 319ms, application-code: 62ms)
+⚠ Blocked cross-origin request to Next.js dev resource /_next/webpack-hmr from "192.168.1.201".
+Cross-origin access to Next.js dev resources is blocked by default for safety.
+
+To allow this host in development, add it to "allowedDevOrigins" in next.config.js and restart the dev server:
+
+// next.config.js
+module.exports = {
+  allowedDevOrigins: ['192.168.1.201'],
+}
+
+Read more: https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins
+prisma:query BEGIN
+prisma:query DEALLOCATE ALL
+prisma:query SELECT "public"."User"."id", "public"."User"."name", "public"."User"."email", "public"."User"."password" FROM "public"."User" WHERE ("public"."User"."email" = $1 AND 1=1) LIMIT $2 OFFSET $3
+prisma:query COMMIT
+ POST /login 303 in 2.1s (next.js: 9ms, application-code: 2.1s)
+prisma:query BEGIN
+ GET / 200 in 183ms (next.js: 9ms, application-code: 175ms)
+prisma:query DEALLOCATE ALL
+prisma:query SELECT "public"."Workspace"."id", "public"."Workspace"."name", "public"."Workspace"."createdAt" FROM "public"."Workspace" WHERE EXISTS(SELECT "t0"."workspaceId" FROM "public"."WorkspaceMember" AS "t0" WHERE ("t0"."userId" = $1 AND ("public"."Workspace"."id") = ("t0"."workspaceId") AND "t0"."workspaceId" IS NOT NULL)) OFFSET $2
+ POST /login 200 in 471ms (next.js: 1164µs, application-code: 470ms)
+prisma:query SELECT "public"."WorkspaceMember"."id", "public"."WorkspaceMember"."workspaceId", "public"."WorkspaceMember"."userId", "public"."WorkspaceMember"."role", "public"."WorkspaceMember"."createdAt" FROM "public"."WorkspaceMember" WHERE "public"."WorkspaceMember"."workspaceId" IN ($1,$2) OFFSET $3
+ POST /login 200 in 168ms (next.js: 2ms, application-code: 165ms)
+prisma:query SELECT "public"."User"."id", "public"."User"."name", "public"."User"."email", "public"."User"."password" FROM "public"."User" WHERE "public"."User"."id" IN ($1) OFFSET $2
+ POST /login 200 in 137ms (next.js: 2000µs, application-code: 135ms)
+prisma:query BEGIN
+ POST /login 200 in 139ms (next.js: 2ms, application-code: 136ms)
+prisma:query DEALLOCATE ALL
+prisma:query SELECT "public"."Board"."id", "public"."Board"."title", "public"."Board"."visibility", "public"."Board"."workspaceId", "public"."Board"."createdAt", "public"."Board"."updatedAt" FROM "public"."Board" WHERE "public"."Board"."workspaceId" IN ($1,$2) OFFSET $3
+prisma:query COMMIT
+ POST /login 200 in 186ms (next.js: 1891µs, application-code: 184ms)
+prisma:query SELECT "public"."User"."id", "public"."User"."name", "public"."User"."email", "public"."User"."password" FROM "public"."User" WHERE ("public"."User"."email" = $1 AND 1=1) LIMIT $2 OFFSET $3
+ POST /login 200 in 139ms (next.js: 1087µs, application-code: 138ms)
+prisma:query COMMIT
+prisma:query BEGIN
+prisma:query BEGIN
+prisma:query DEALLOCATE ALL
+ POST /login 200 in 152ms (next.js: 898µs, application-code: 152ms)
+prisma:query DEALLOCATE ALL
+prisma:query BEGIN
+prisma:query BEGIN
+prisma:query DEALLOCATE ALL
+ POST /login 200 in 163ms (next.js: 938µs, application-code: 162ms)
+prisma:query SELECT "public"."User"."id", "public"."User"."name", "public"."User"."email", "public"."User"."password" FROM "public"."User" WHERE ("public"."User"."email" = $1 AND 1=1) LIMIT $2 OFFSET $3
+prisma:query DEALLOCATE ALL
+prisma:query SELECT "public"."User"."id", "public"."User"."name", "public"."User"."email", "public"."User"."password" FROM "public"."User" WHERE ("public"."User"."email" = $1 AND 1=1) LIMIT $2 OFFSET $3
+prisma:query COMMIT
+prisma:query BEGIN
+ POST /login 200 in 174ms (next.js: 1042µs, application-code: 173ms)
+prisma:query COMMIT
+prisma:query SELECT "public"."User"."id", "public"."User"."name", "public"."User"."email", "public"."User"."password" FROM "public"."User" WHERE ("public"."User"."email" = $1 AND 1=1) LIMIT $2 OFFSET $3
+prisma:query BEGIN
+prisma:query DEALLOCATE ALL
+prisma:query BEGIN
+prisma:query COMMIT
+prisma:query SELECT "public"."User"."id", "public"."User"."name", "public"."User"."email", "public"."User"."password" FROM "public"."User" WHERE ("public"."User"."email" = $1 AND 1=1) LIMIT $2 OFFSET $3
+prisma:query DEALLOCATE ALL
+ POST /login 200 in 183ms (next.js: 814µs, application-code: 183ms)
+prisma:query DEALLOCATE ALL
+prisma:query COMMIT
+prisma:query SELECT "public"."User"."id", "public"."User"."name", "public"."User"."email", "public"."User"."password" FROM "public"."User" WHERE ("public"."User"."email" = $1 AND 1=1) LIMIT $2 OFFSET $3
+prisma:query BEGIN
+prisma:query BEGIN
+prisma:query SELECT "public"."User"."id", "public"."User"."name", "public"."User"."email", "public"."User"."password" FROM "public"."User" WHERE ("public"."User"."email" = $1 AND 1=1) LIMIT $2 OFFSET $3
+prisma:query COMMIT
+prisma:query DEALLOCATE ALL
+ POST /login 200 in 198ms (next.js: 697µs, application-code: 197ms)
+prisma:query COMMIT
+prisma:query SELECT "public"."User"."id", "public"."User"."name", "public"."User"."email", "public"."User"."password" FROM "public"."User" WHERE ("public"."User"."email" = $1 AND 1=1) LIMIT $2 OFFSET $3
+prisma:query DEALLOCATE ALL
+prisma:query BEGIN
+prisma:query SELECT "public"."User"."id", "public"."User"."name", "public"."User"."email", "public"."User"."password" FROM "public"."User" WHERE ("public"."User"."email" = $1 AND 1=1) LIMIT $2 OFFSET $3
+prisma:query COMMIT
+prisma:query COMMIT
+prisma:query SELECT "public"."User"."id", "public"."User"."name", "public"."User"."email", "public"."User"."password" FROM "public"."User" WHERE ("public"."User"."email" = $1 AND 1=1) LIMIT $2 OFFSET $3
+prisma:query BEGIN
+prisma:query DEALLOCATE ALL
+prisma:query COMMIT
+prisma:query DEALLOCATE ALL
+prisma:query SELECT "public"."User"."id", "public"."User"."name", "public"."User"."email", "public"."User"."password" FROM "public"."User" WHERE ("public"."User"."email" = $1 AND 1=1) LIMIT $2 OFFSET $3
+prisma:query SELECT "public"."User"."id", "public"."User"."name", "public"."User"."email", "public"."User"."password" FROM "public"."User" WHERE ("public"."User"."email" = $1 AND 1=1) LIMIT $2 OFFSET $3
+prisma:query COMMIT
+ POST /login 303 in 663ms (next.js: 793µs, application-code: 662ms)
+prisma:query COMMIT
+prisma:query BEGIN
+prisma:query DEALLOCATE ALL
+prisma:query SELECT "public"."Workspace"."id", "public"."Workspace"."name", "public"."Workspace"."createdAt" FROM "public"."Workspace" WHERE EXISTS(SELECT "t0"."workspaceId" FROM "public"."WorkspaceMember" AS "t0" WHERE ("t0"."userId" = $1 AND ("public"."Workspace"."id") = ("t0"."workspaceId") AND "t0"."workspaceId" IS NOT NULL)) OFFSET $2
+prisma:query SELECT "public"."WorkspaceMember"."id", "public"."WorkspaceMember"."workspaceId", "public"."WorkspaceMember"."userId", "public"."WorkspaceMember"."role", "public"."WorkspaceMember"."createdAt" FROM "public"."WorkspaceMember" WHERE "public"."WorkspaceMember"."workspaceId" IN ($1,$2) OFFSET $3
+prisma:query SELECT "public"."User"."id", "public"."User"."name", "public"."User"."email", "public"."User"."password" FROM "public"."User" WHERE "public"."User"."id" IN ($1) OFFSET $2
+prisma:query SELECT "public"."Board"."id", "public"."Board"."title", "public"."Board"."visibility", "public"."Board"."workspaceId", "public"."Board"."createdAt", "public"."Board"."updatedAt" FROM "public"."Board" WHERE "public"."Board"."workspaceId" IN ($1,$2) OFFSET $3
+prisma:query COMMIT
+ GET / 200 in 1189ms (next.js: 719µs, application-code: 1188ms)
+prisma:query BEGIN
+prisma:query DEALLOCATE ALL
+prisma:query SELECT "public"."Board"."id", "public"."Board"."title", "public"."Board"."visibility", "public"."Board"."workspaceId", "public"."Board"."createdAt", "public"."Board"."updatedAt" FROM "public"."Board" WHERE ("public"."Board"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+prisma:query SELECT "public"."Workspace"."id", "public"."Workspace"."name", "public"."Workspace"."createdAt" FROM "public"."Workspace" WHERE "public"."Workspace"."id" IN ($1) OFFSET $2
+prisma:query SELECT "public"."WorkspaceMember"."id", "public"."WorkspaceMember"."workspaceId", "public"."WorkspaceMember"."userId", "public"."WorkspaceMember"."role", "public"."WorkspaceMember"."createdAt" FROM "public"."WorkspaceMember" WHERE "public"."WorkspaceMember"."workspaceId" IN ($1) OFFSET $2
+prisma:query SELECT "public"."AutomationRule"."id", "public"."AutomationRule"."boardId", "public"."AutomationRule"."triggerType", "public"."AutomationRule"."triggerData", "public"."AutomationRule"."actionType", "public"."AutomationRule"."actionData", "public"."AutomationRule"."createdAt" FROM "public"."AutomationRule" WHERE "public"."AutomationRule"."boardId" IN ($1) OFFSET $2
+prisma:query SELECT "public"."List"."id", "public"."List"."title", "public"."List"."color", "public"."List"."order", "public"."List"."boardId", "public"."List"."createdAt", "public"."List"."updatedAt" FROM "public"."List" WHERE "public"."List"."boardId" IN ($1) ORDER BY "public"."List"."order" ASC OFFSET $2
+prisma:query SELECT "public"."Card"."id", "public"."Card"."title", "public"."Card"."description", "public"."Card"."order", "public"."Card"."listId", "public"."Card"."assigneeId", "public"."Card"."ownerName", "public"."Card"."dueDate", "public"."Card"."coverColor", "public"."Card"."createdAt", "public"."Card"."updatedAt" FROM "public"."Card" WHERE "public"."Card"."listId" IN ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) ORDER BY "public"."Card"."order" ASC OFFSET $14
+prisma:query SELECT "public"."Comment"."id", "public"."Comment"."content", "public"."Comment"."cardId", "public"."Comment"."userId", "public"."Comment"."createdAt", "public"."Comment"."updatedAt" FROM "public"."Comment" WHERE "public"."Comment"."cardId" IN ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) ORDER BY "public"."Comment"."createdAt" DESC OFFSET $14
+prisma:query SELECT "public"."Attachment"."id", "public"."Attachment"."fileName", "public"."Attachment"."fileUrl", "public"."Attachment"."fileType", "public"."Attachment"."cardId", "public"."Attachment"."createdAt" FROM "public"."Attachment" WHERE "public"."Attachment"."cardId" IN ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) ORDER BY "public"."Attachment"."createdAt" DESC OFFSET $14
+prisma:query COMMIT
+prisma:query BEGIN
+prisma:query DEALLOCATE ALL
+prisma:query SELECT "public"."User"."id", "public"."User"."name", "public"."User"."email" FROM "public"."User" WHERE 1=1 OFFSET $1
+prisma:query COMMIT
+ GET /b/cmnx5nrkx0007le09gnghbf8r 200 in 8.2s (next.js: 906ms, application-code: 7.3s)
+prisma:query SELECT 1
+prisma:query BEGIN
+prisma:query DEALLOCATE ALL
+prisma:query SELECT "public"."Workspace"."id", "public"."Workspace"."name", "public"."Workspace"."createdAt" FROM "public"."Workspace" WHERE EXISTS(SELECT "t0"."workspaceId" FROM "public"."WorkspaceMember" AS "t0" WHERE ("t0"."userId" = $1 AND ("public"."Workspace"."id") = ("t0"."workspaceId") AND "t0"."workspaceId" IS NOT NULL)) OFFSET $2
+prisma:query SELECT "public"."WorkspaceMember"."id", "public"."WorkspaceMember"."workspaceId", "public"."WorkspaceMember"."userId", "public"."WorkspaceMember"."role", "public"."WorkspaceMember"."createdAt" FROM "public"."WorkspaceMember" WHERE "public"."WorkspaceMember"."workspaceId" IN ($1,$2) OFFSET $3
+prisma:query SELECT "public"."User"."id", "public"."User"."name", "public"."User"."email", "public"."User"."password" FROM "public"."User" WHERE "public"."User"."id" IN ($1) OFFSET $2
+prisma:query SELECT "public"."Board"."id", "public"."Board"."title", "public"."Board"."visibility", "public"."Board"."workspaceId", "public"."Board"."createdAt", "public"."Board"."updatedAt" FROM "public"."Board" WHERE "public"."Board"."workspaceId" IN ($1,$2) OFFSET $3
+prisma:query COMMIT
+ GET / 200 in 1361ms (next.js: 36ms, application-code: 1325ms)
+prisma:query BEGIN
+prisma:query DEALLOCATE ALL
+prisma:query SELECT "public"."Workspace"."id", "public"."Workspace"."name", "public"."Workspace"."createdAt" FROM "public"."Workspace" WHERE EXISTS(SELECT "t0"."workspaceId" FROM "public"."WorkspaceMember" AS "t0" WHERE ("t0"."userId" = $1 AND ("public"."Workspace"."id") = ("t0"."workspaceId") AND "t0"."workspaceId" IS NOT NULL)) OFFSET $2
+prisma:query SELECT "public"."WorkspaceMember"."id", "public"."WorkspaceMember"."workspaceId", "public"."WorkspaceMember"."userId", "public"."WorkspaceMember"."role", "public"."WorkspaceMember"."createdAt" FROM "public"."WorkspaceMember" WHERE "public"."WorkspaceMember"."workspaceId" IN ($1,$2) OFFSET $3
+prisma:query SELECT "public"."User"."id", "public"."User"."name", "public"."User"."email", "public"."User"."password" FROM "public"."User" WHERE "public"."User"."id" IN ($1) OFFSET $2
+prisma:query SELECT "public"."Board"."id", "public"."Board"."title", "public"."Board"."visibility", "public"."Board"."workspaceId", "public"."Board"."createdAt", "public"."Board"."updatedAt" FROM "public"."Board" WHERE "public"."Board"."workspaceId" IN ($1,$2) OFFSET $3
+prisma:query COMMIT
+ GET / 200 in 1267ms (next.js: 3ms, application-code: 1264ms)
+prisma:query SELECT 1
+prisma:query BEGIN
+prisma:query DEALLOCATE ALL
+prisma:query SELECT "public"."Workspace"."id", "public"."Workspace"."name", "public"."Workspace"."createdAt" FROM "public"."Workspace" WHERE EXISTS(SELECT "t0"."workspaceId" FROM "public"."WorkspaceMember" AS "t0" WHERE ("t0"."userId" = $1 AND ("public"."Workspace"."id") = ("t0"."workspaceId") AND "t0"."workspaceId" IS NOT NULL)) OFFSET $2
+prisma:query SELECT "public"."WorkspaceMember"."id", "public"."WorkspaceMember"."workspaceId", "public"."WorkspaceMember"."userId", "public"."WorkspaceMember"."role", "public"."WorkspaceMember"."createdAt" FROM "public"."WorkspaceMember" WHERE "public"."WorkspaceMember"."workspaceId" IN ($1,$2) OFFSET $3
+prisma:query SELECT "public"."User"."id", "public"."User"."name", "public"."User"."email", "public"."User"."password" FROM "public"."User" WHERE "public"."User"."id" IN ($1) OFFSET $2
+prisma:query SELECT "public"."Board"."id", "public"."Board"."title", "public"."Board"."visibility", "public"."Board"."workspaceId", "public"."Board"."createdAt", "public"."Board"."updatedAt" FROM "public"."Board" WHERE "public"."Board"."workspaceId" IN ($1,$2) OFFSET $3
+prisma:query COMMIT
+ GET / 200 in 1310ms (next.js: 9ms, application-code: 1301ms)

@@ -30,6 +30,9 @@ export default function DashboardClient({ initialWorkspaces }: DashboardProps) {
   const [showMappingModal, setShowMappingModal] = useState(false);
   const [excelHeaders, setExcelHeaders] = useState<string[]>([]);
   const [excelFile, setExcelFile] = useState<File | null>(null);
+  const [parsedWorkbook, setParsedWorkbook] = useState<xlsx.WorkBook | null>(null);
+  const [sheetNames, setSheetNames] = useState<string[]>([]);
+  const [selectedSheet, setSelectedSheet] = useState<string>('');
 
   const handleCreateWorkspace = () => {
     setWsName('');
@@ -37,14 +40,17 @@ export default function DashboardClient({ initialWorkspaces }: DashboardProps) {
   };
 
   const submitCreateWorkspace = async () => {
-    if (!wsName.trim()) return;
+    if (!wsName.trim()) {
+      alert("Please enter a workspace name");
+      return;
+    }
     try {
       const newWs = await createWorkspaceAction(wsName.trim());
       setWorkspaces([...workspaces, newWs as any]);
       setShowWsModal(false);
       setWsName('');
-    } catch (e) {
-      alert('Failed to create workspace');
+    } catch (e: any) {
+      alert('Failed to create workspace: ' + (e?.message || JSON.stringify(e)));
     }
   };
 
@@ -74,6 +80,23 @@ export default function DashboardClient({ initialWorkspaces }: DashboardProps) {
     fileInputRef.current?.click();
   };
 
+  const extractHeaders = (workbook: xlsx.WorkBook, sheetName: string) => {
+    const worksheet = workbook.Sheets[sheetName];
+    if (!worksheet) return [];
+    const json = xlsx.utils.sheet_to_json(worksheet, { header: 1 }) as string[][];
+
+    let bestRowIndex = 0;
+    let maxCols = 0;
+    for (let i = 0; i < Math.min(10, json.length); i++) {
+      const rowProps = json[i]?.filter(c => typeof c === 'string' && c.trim() !== '') || [];
+      if (rowProps.length > maxCols) {
+        maxCols = rowProps.length;
+        bestRowIndex = i;
+      }
+    }
+    return (json[bestRowIndex] as string[])?.map(h => String(h).trim()).filter(h => h) || [];
+  };
+
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !importTargetWsId) return;
@@ -81,27 +104,14 @@ export default function DashboardClient({ initialWorkspaces }: DashboardProps) {
     try {
       const arrayBuffer = await file.arrayBuffer();
       const workbook = xlsx.read(arrayBuffer, { type: 'array' });
-      const firstSheetName = workbook.SheetNames[0];
-      const worksheet = workbook.Sheets[firstSheetName];
-      const json = xlsx.utils.sheet_to_json(worksheet, { header: 1 }) as string[][];
-
-      let bestRowIndex = 0;
-      let maxCols = 0;
-      for (let i = 0; i < Math.min(10, json.length); i++) {
-        const rowProps = json[i]?.filter(c => typeof c === 'string' && c.trim() !== '') || [];
-        if (rowProps.length > maxCols) {
-          maxCols = rowProps.length;
-          bestRowIndex = i;
-        }
-      }
-
-      const headers = (json[bestRowIndex] as string[])?.map(h => String(h).trim()).filter(h => h) || [];
-
-      if (headers.length === 0) {
-        alert('No headers found in the Excel file!');
-        return;
-      }
-
+      setParsedWorkbook(workbook);
+      
+      const names = workbook.SheetNames;
+      setSheetNames(names);
+      const firstSheet = names[0];
+      setSelectedSheet(firstSheet);
+      
+      const headers = extractHeaders(workbook, firstSheet);
       setExcelHeaders(headers);
       setExcelFile(file);
       setShowMappingModal(true);
@@ -110,13 +120,22 @@ export default function DashboardClient({ initialWorkspaces }: DashboardProps) {
     }
   };
 
-  const handleConfirmMapping = async (cardTitleColumn: string, listColumn: string, assigneeColumn: string) => {
+  const handleSheetChange = (sheetName: string) => {
+    setSelectedSheet(sheetName);
+    if (parsedWorkbook) {
+      const targetSheet = sheetName === 'ALL' ? parsedWorkbook.SheetNames[0] : sheetName;
+      setExcelHeaders(extractHeaders(parsedWorkbook, targetSheet));
+    }
+  };
+
+  const handleConfirmMapping = async (sheetName: string, cardTitleColumn: string, listColumn: string, assigneeColumn: string) => {
     if (!excelFile || !importTargetWsId) return;
 
     setShowMappingModal(false);
     setIsImporting(true);
     const formData = new FormData();
     formData.append('file', excelFile);
+    formData.append('sheetName', sheetName);
     formData.append('cardTitleColumn', cardTitleColumn);
     formData.append('listColumn', listColumn);
     formData.append('assigneeColumn', assigneeColumn);
@@ -259,9 +278,12 @@ export default function DashboardClient({ initialWorkspaces }: DashboardProps) {
       )}
 
       {showMappingModal && excelHeaders.length > 0 && (
-        <ExcelMappingModal
-          headers={excelHeaders}
-          onConfirm={handleConfirmMapping}
+        <ExcelMappingModal 
+          headers={excelHeaders} 
+          sheetNames={sheetNames}
+          selectedSheet={selectedSheet}
+          onSheetChange={handleSheetChange}
+          onConfirm={handleConfirmMapping} 
           onCancel={handleCancelMapping}
         />
       )}

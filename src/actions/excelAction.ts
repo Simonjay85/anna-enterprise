@@ -22,6 +22,7 @@ export async function importExcelToWorkspaceAction(workspaceId: string, formData
   if (!membership) throw new Error("Not a member of this workspace");
 
   const file = formData.get('file') as File;
+  const sheetName = formData.get('sheetName') as string;
   const cardTitleColumn = formData.get('cardTitleColumn') as string;
   const listColumn = formData.get('listColumn') as string;
   const assigneeColumn = formData.get('assigneeColumn') as string;
@@ -33,23 +34,46 @@ export async function importExcelToWorkspaceAction(workspaceId: string, formData
 
   // Read excel
   const workbook = xlsx.read(buffer, { type: 'buffer' });
-  const sheetNames = workbook.SheetNames;
+  const targetSheets = sheetName === 'ALL' ? workbook.SheetNames : [sheetName];
 
-  for (const sheetName of sheetNames) {
-    const worksheet = workbook.Sheets[sheetName];
+  for (const currentSheetName of targetSheets) {
+    if (!workbook.Sheets[currentSheetName]) continue;
+
+    const worksheet = workbook.Sheets[currentSheetName];
     const rawRows = xlsx.utils.sheet_to_json<any[]>(worksheet, { header: 1 });
     if (rawRows.length === 0) continue;
 
-    // Find best header row (most string columns)
-    let bestRowIndex = 0;
+    // Find best header row (most string columns) or the row that contains our target columns
+    let bestRowIndex = -1;
     let maxCols = 0;
-    for (let i = 0; i < Math.min(10, rawRows.length); i++) {
-      const rowProps = rawRows[i]?.filter((c: any) => typeof c === 'string' && c.trim() !== '') || [];
-      if (rowProps.length > maxCols) {
-        maxCols = rowProps.length;
+    
+    // First pass: look strictly for the mapped columns
+    for (let i = 0; i < Math.min(15, rawRows.length); i++) {
+      const rowStrings = rawRows[i]?.map((c: any) => String(c).trim()) || [];
+      if ((cardTitleColumn && rowStrings.includes(cardTitleColumn)) || 
+          (listColumn && rowStrings.includes(listColumn))) {
         bestRowIndex = i;
+        break;
       }
     }
+
+    // If we're importing ALL sheets, and this sheet doesn't contain the requested columns, skip it to avoid garbage data.
+    if (sheetName === 'ALL' && bestRowIndex === -1 && (cardTitleColumn || listColumn)) {
+      continue;
+    }
+
+    // If not found and not skipped, use fallback logic (most string cols)
+    if (bestRowIndex === -1) {
+      for (let i = 0; i < Math.min(15, rawRows.length); i++) {
+        const rowProps = rawRows[i]?.filter((c: any) => typeof c === 'string' && c.trim() !== '') || [];
+        if (rowProps.length > maxCols) {
+          maxCols = rowProps.length;
+          bestRowIndex = i;
+        }
+      }
+    }
+
+    if (bestRowIndex === -1) continue;
 
     const headers = rawRows[bestRowIndex]?.map((h: any) => String(h).trim()) || [];
     if (headers.length === 0) continue;
@@ -75,7 +99,7 @@ export async function importExcelToWorkspaceAction(workspaceId: string, formData
 
     // Create board for this sheet
     const board = await prisma.board.create({
-      data: { title: sheetName, workspaceId }
+      data: { title: currentSheetName, workspaceId }
     });
 
     // Collect unique list names
